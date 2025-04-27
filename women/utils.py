@@ -1,6 +1,7 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
+from .models import Category
 from django.db.models import Count
-
-from women.models import Category
 
 menu = [
     {'title': "О сайте", 'url_name': 'about'},
@@ -10,10 +11,8 @@ menu = [
 ]
 
 class DataMixin:
-    def get_user_context(self,  **kwargs):
+    def get_user_context(self, **kwargs):
         context = kwargs
-        # cats = Category.objects.all()
-        # cats = Category.objects.annotate(Count('women')).filter(cnt__gt=0)
         cats = Category.objects.annotate(Count('women'))
 
         user_menu = menu.copy()
@@ -24,5 +23,12 @@ class DataMixin:
         context['cats'] = cats
         if 'cat_selected' not in context:
             context['cat_selected'] = 0
-        context['cat_selected'] = 0
         return context
+
+class LoginDataMixin(LoginRequiredMixin, DataMixin):
+    raise_exception = True
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(**kwargs)
+        return {**context, **c_def}

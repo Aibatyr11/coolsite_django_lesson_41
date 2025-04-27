@@ -5,9 +5,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
 
+
 from .forms import *
 from .models import *
 from .utils import DataMixin
+from .utils import LoginDataMixin
+
 
 
 # menu = [{'title': "О сайте", 'url_name': 'about'},
@@ -50,7 +53,7 @@ def about(request):
     return render(request, 'women/about.html', {'menu': menu, 'title': 'О сайте'})
 
 
-class AddPage(LoginRequiredMixin, DataMixin, CreateView):
+class AddPage(LoginDataMixin, CreateView):
     form_class = AddPostForm
     template_name = 'women/addpage.html'
     success_url = reverse_lazy('home')
